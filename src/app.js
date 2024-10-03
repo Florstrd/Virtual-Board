@@ -1,8 +1,13 @@
 const express = require("express");
 require('dotenv').config();
+const cors = require("cors");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+app.use(cors({
+    origin: process.env.DEV_ORIGIN
+}));
 
 app.get("/", (req, res) => {
     res.send("<h1>Hello!</h1>");
