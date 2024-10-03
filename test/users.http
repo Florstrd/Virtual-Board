@@ -1,0 +1,22 @@
+@apiURL = http://localhost:8080
+
+###
+
+POST {{apiURL}}/users/
+Content-Type: application/json
+
+{
+    "name": "Dennis",
+    "email": "dennis@email.com",
+    "password": "password"
+}
+
+###
+
+POST {{apiURL}}/users/login/
+Content-Type: application/json
+
+{
+    "email": "dennis@email.com",
+    "password": "password"
+}
