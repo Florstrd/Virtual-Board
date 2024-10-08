@@ -8,7 +8,13 @@ async function logIn(user, password) {
         })
     });
     const respData = await response.json();
-            console.log(respData.jwt);
+            console.log(respData);
+            
+            if (respData.jwt) {
+                localStorage.setItem("jwt", respData.jwt);
+                console.log("Logged in")
+            }
+            
 }
 
 document.querySelector('#btn-login').addEventListener('click', () => {
