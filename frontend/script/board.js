@@ -1,4 +1,4 @@
-WS_TOKEN = localStorage.getItem('ws_token');
+WS_TOKEN = localStorage.getItem('jwt');
 const socket = new WebSocket(`ws://localhost:5000?token=${WS_TOKEN}`);
     
     
