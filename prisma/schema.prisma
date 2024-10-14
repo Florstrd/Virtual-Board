@@ -10,8 +10,8 @@ datasource db {
 model Notes {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   note String
-  author Users @relation(fields: [authorId], references: [id])
-  authorId String @db.ObjectId
+  board Boards @relation(fields: [boardId], references: [id])
+  boardId String @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -21,6 +21,16 @@ model Users {
   name String
   email String @unique
   password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Boards Boards[]
+}
+
+model Boards {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  author Users @relation(fields: [authorId], references: [id])
+  authorId String @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Notes Notes[]

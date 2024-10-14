@@ -3,7 +3,10 @@ const jwt = require("jsonwebtoken");
 
 module.exports =  (req, res, next) => {
     try{
-        const userData = jwt.verify(localStorage.getItem("jwt"), process.env.JWT_SECRET);
+        const authHeader = req.headers["authorization"];
+        const token = authHeader?.split(" ")[1];
+
+        const userData = jwt.verify(token, process.env.JWT_SECRET);
         console.log(`token authorized for user ${userData.sub} ${userData.name}`);
 
         req.userData = userData;

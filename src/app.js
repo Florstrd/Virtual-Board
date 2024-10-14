@@ -15,12 +15,15 @@ app.get("/", (req, res) => {
 })
 
 app.use(express.json());
+const auth = require("./middleware/auth");
+
+const boardsRouter = require('./routes/boards');
+app.use('/boards', boardsRouter);
 
 const notesRouter = require('./routes/notes');
 app.use('/notes', notesRouter);
 
 const usersRouter = require("./routes/users");
-const auth = require("./middleware/auth");
 app.use("/users", usersRouter);
 
 app.listen(PORT, () => {

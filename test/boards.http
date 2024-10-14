@@ -1,0 +1,17 @@
+@apiURL = http://localhost:8080
+
+@JWT = {{$dotenv JWT_TEST}}
+
+GET {{apiURL}}/boards
+Content-Type: application/json,
+Authorization: Bearer {{JWT}}
+
+###
+
+POST {{apiURL}}/boards
+Content-Type: application/json,
+Authorization: Bearer {{JWT}}
+
+{
+    "name": "Board 4"
+}
