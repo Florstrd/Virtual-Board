@@ -3,15 +3,21 @@
 @JWT = {{$dotenv JWT_TEST}}
 
 GET {{apiURL}}/boards
-Content-Type: application/json,
+Content-Type: application/json
 Authorization: Bearer {{JWT}}
 
 ###
 
 POST {{apiURL}}/boards
-Content-Type: application/json,
+Content-Type: application/json
 Authorization: Bearer {{JWT}}
 
 {
     "name": "Board 4"
 }
+
+###
+
+GET {{apiURL}}/boards/670d401ca6e5a9c7b7237d94
+Content-Type: application/json
+Authorization: Bearer {{JWT}}

@@ -18,8 +18,8 @@ async function logIn(user, password) {
             
 }
 
-async function saveNotes(boardId, note) {
-    const response = await fetch("http://localhost:8080/notes", {
+async function saveNewNote() {
+    const response = await fetch("http:/localhost:8080/notes", {
         method: "POST",
         headers: { "Content-Type": "application/json",
             "Authorization": `Bearer ${jwt}` },
@@ -30,6 +30,17 @@ async function saveNotes(boardId, note) {
     });
     const respData = await response.json();
     console.log(respData);
+}
+
+async function editNote(noteId, note) {
+    const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}` },
+        body: JSON.stringify({
+            note: note
+        })
+    })
 }
 
 async function getBoards() {
@@ -56,7 +67,7 @@ async function getBoards() {
 
 async function getNotes(boardId) {
     const jwt = localStorage.getItem("jwt");
-    const response = await fetch("http://localhost:8080/notes", {
+    const response = await fetch(`http://localhost:8080/boards/${boardId}`, {
         method: "GET",
         headers: { 
             "Content-Type": "application/json",
@@ -64,12 +75,10 @@ async function getNotes(boardId) {
          }
     });
     const respData = await response.json();
-    console.log(respData);
 
     for (let i in respData) {
-        console.log(respData[i].note);
         document.getElementById("board").innerHTML+=`
-        <div class="note draggable" id="note">
+        <div class="note draggable" style="${respData[i].style}" id="${respData[i].id}">
             <div id="note-header">
                 <button class="btn">
                     <img src="./images/green.png" alt="">
@@ -82,7 +91,7 @@ async function getNotes(boardId) {
                 </button>
             </div>
             <div class="container" id="note-field">
-                <p>blah blah</p>
+                <textarea>${respData[i].note}</textarea>
             </div>
         </div>`;
     }
@@ -114,10 +123,12 @@ socket.onopen = function (event) {
 };
 
 socket.onmessage = function (event) {
-    console.log('Received message:', event.data);
     const data = JSON.parse(event.data);
+    const message = JSON.parse(data.msg);
+    console.log('Received message:', message);
     if (data.status == 0) {
-        document.querySelector('#note').setAttribute("style", data.msg);
+        document.getElementById(`${message.id}`).setAttribute("style", message.style);
+        document.getElementById(`${message.id}`).children[1].children[0].value = message.note;
     } else {
         
     }
@@ -125,7 +136,16 @@ socket.onmessage = function (event) {
 };
 
 document.querySelector('#board').addEventListener("mouseup" , (evt) => {
-    socket.send(document.querySelector("#note").getAttribute("style"));
+    if (evt.target.classList.contains("note")) {
+        message = {
+            id: evt.target.id,
+            style: evt.target.getAttribute("style"),
+            note: evt.target.children[1].children[0].value
+        }
+        console.log(message);
+        socket.send(JSON.stringify(message));
+    }
+
 });
 
 socket.onclose = function (event) {
@@ -142,64 +162,44 @@ document.querySelector('#btn-login').addEventListener('click', () => {
 
 // Change board from menu
 document.querySelector("#boards-menu").addEventListener("click", (e) => {
-    console.log(e.target);
+    console.log(e.target.classList);
+    let boardId = e.target.id;
     let boardName = e.target.name;
     if (e.target.id === "new-board") {
         boardName = prompt("Enter name for new board:");
         saveNewBoard(boardName);
     }
     document.getElementById("board").innerHTML=`<button class="btn btn-primary position-absolute end-0" id="new-note-btn">New note</button>
-    <h2>${boardName}</h2>
-    <div class="note draggable" id="note">
-            <div id="note-header">
-                <button class="btn" id="delete-note">X</button>
-                <button class="btn">
-                    <img src="./images/green.png" alt="">
-                </button>
-                <button class="btn">
-                    <img src="./images/red.png" alt="">
-                </button>
-                <button class="btn">
-                    <img src="./images/blue.png" alt="">
-                </button>
-            </div>
-            <div class="container" id="note-field">
-                <input class="form-control id="note-value">Something important</input>
-            </div>
-        </div>`;
-    //getNotes(boardName);
+    <h2 id="${boardId}">${boardName}</h2>`;
+    getNotes(boardId);
+    localStorage.setItem("boardId", boardId);
 });
 
 
-//document.getElementById("new-note-btn").addEventListener("click", () => {
-//    createNewNote();
-//    console.log("New note");
-//    //saveNotes(boardId, document.querySelector("#note-field > p").innerText);
-//    //console.log(document.querySelectorAll("#note"))
-//    //getBoards();
-//})
+document.addEventListener("click", (evt) => {
+    if (evt.target.id === "new-note-btn") {
+        createNewNote();
+        console.log("New note");
+    }
+})
 
 
-
-function createNewNote() {
-    document.getElementById("board").innerHTML+=`
-    <div class="note draggable" id="note">
-            <div id="note-header">
-                <button class="btn" id="delete-note">X</button>
-                <button class="btn">
-                    <img src="./images/green.png" alt="">
-                </button>
-                <button class="btn">
-                    <img src="./images/red.png" alt="">
-                </button>
-                <button class="btn">
-                    <img src="./images/blue.png" alt="">
-                </button>
-            </div>
-            <div class="container" id="note-field">
-                <p>blah blah</p>
-            </div>
-        </div>`;
+async function createNewNote() {
+    const jwt = localStorage.getItem("jwt");
+    const boardId = localStorage.getItem("boardId");
+    const response = await fetch("http://localhost:8080/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}` },
+        body: JSON.stringify({
+            boardId: boardId,
+            note: "",
+            style: ""
+        })
+    });
+    const respData = await response.json();
+    console.log(respData);
+    getNotes(boardId);
   }
 
 

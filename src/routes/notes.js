@@ -24,7 +24,8 @@ router.post('/', authorize, async (req, res) => {
         const newNote = await prisma.notes.create({
             data: {
                 boardId: req.body.boardId,
-                note: req.body.note
+                note: req.body.note,
+                style: req.body.style
             }
         });
         res.send({ msg: "Note added!" });

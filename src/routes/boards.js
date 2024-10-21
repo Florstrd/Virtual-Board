@@ -7,17 +7,30 @@ const prisma = new PrismaClient();
 
 router.get('/', authorize, async (req, res) => {
     try {
-    console.log("notes / GET");
-    const notes = await prisma.boards.findMany({
+    console.log("boards / GET");
+    const boards = await prisma.boards.findMany({
         where: {
             authorId: req.userData.sub
         }
     })
-    res.send(notes);
+    res.send(boards);
     } catch (error) {
         res.status(500).send({msg: "ERROR"});
     }
     
+})
+
+router.get('/:id', authorize, async (req, res) => {
+    try {
+        const notes = await prisma.notes.findMany({
+            where: {
+                boardId: req.params.id
+            }
+        })
+        res.send(notes);
+    } catch (error) {
+        res.status(500).send({msg: "ERROR"});
+    }
 })
 
 router.post('/', authorize, async (req, res) => {

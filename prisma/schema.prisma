@@ -10,6 +10,7 @@ datasource db {
 model Notes {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   note String
+  style String
   board Boards @relation(fields: [boardId], references: [id])
   boardId String @db.ObjectId
   createdAt DateTime @default(now())

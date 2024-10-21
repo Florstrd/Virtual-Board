@@ -3,16 +3,17 @@
 @JWT = {{$dotenv JWT_TEST}}
 
 GET {{apiURL}}/notes
-Content-Type: application/json,
+Content-Type: application/json
 Authorization: Bearer {{JWT}}
 
 ###
 
 POST {{apiURL}}/notes
-Content-Type: application/json,
+Content-Type: application/json
 Authorization: Bearer {{JWT}}
 
 {
     "boardId": "670d401ca6e5a9c7b7237d94",
-    "note": "Complete everything"
+    "note": "Complete everything",
+    "style": ""
 }
