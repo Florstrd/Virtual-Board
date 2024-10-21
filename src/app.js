@@ -6,9 +6,7 @@ const authorize = require("./middleware/auth");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors({
-    origin: process.env.DEV_ORIGIN
-}));
+app.use(cors());
 
 app.get("/", (req, res) => {
     res.send("<h1>Hello!</h1>");

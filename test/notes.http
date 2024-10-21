@@ -17,3 +17,20 @@ Authorization: Bearer {{JWT}}
     "note": "Complete everything",
     "style": ""
 }
+
+###
+
+PATCH {{apiURL}}/notes/6716098e5a3e81069d5b26e7
+Content-Type: application/json
+Authorization: Bearer {{JWT}}
+
+{
+    "note": "Fix this thing",
+    "style": ""
+}
+
+###
+
+DELETE {{apiURL}}/notes/6716409b303c7833e5ee00e0
+Content-Type: application/json
+Authorization: Bearer {{JWT}}

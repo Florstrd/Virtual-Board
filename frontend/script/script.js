@@ -18,29 +18,55 @@ async function logIn(user, password) {
             
 }
 
-async function saveNewNote() {
-    const response = await fetch("http:/localhost:8080/notes", {
-        method: "POST",
+async function saveNote(noteId, note, style) {
+    const jwt = localStorage.getItem("jwt");
+    const boardId = localStorage.getItem("boardId");
+    try {
+        console.log(jwt);
+        console.log(boardId);
+        const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json",
+                "Authorization": `Bearer ${jwt}` },
+            body: JSON.stringify({
+                boardId: boardId,
+                note: note,
+                style: style
+            })
+        });
+        const respData = await response.json();
+        console.log(respData);
+    } catch (error) {
+        const response = await fetch("http://localhost:8080/notes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json",
+                "Authorization": `Bearer ${jwt}` },
+            body: JSON.stringify({
+                boardId: boardId,
+                note: note,
+                style: style
+            })
+        });
+        const respData = await response.json();
+        console.log(respData);
+    }
+    
+}
+
+async function deleteNote(noteId) {
+    const jwt = localStorage.getItem("jwt");
+    const boardId = localStorage.getItem("boardId");
+    const boardName = localStorage.getItem("boardName");
+    const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
+        method: "DELETE",
         headers: { "Content-Type": "application/json",
-            "Authorization": `Bearer ${jwt}` },
-        body: JSON.stringify({
-            boardId: boardId,
-            note: note
-        })
+            "Authorization": `Bearer ${jwt}` }
     });
     const respData = await response.json();
     console.log(respData);
-}
-
-async function editNote(noteId, note) {
-    const response = await fetch(`http://localhost:8080/notes/${noteId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json",
-            "Authorization": `Bearer ${jwt}` },
-        body: JSON.stringify({
-            note: note
-        })
-    })
+    document.getElementById("board").innerHTML="";
+    printBoard(boardId, boardName);
+    getNotes(boardId);
 }
 
 async function getBoards() {
@@ -79,16 +105,18 @@ async function getNotes(boardId) {
     for (let i in respData) {
         document.getElementById("board").innerHTML+=`
         <div class="note draggable" style="${respData[i].style}" id="${respData[i].id}">
-            <div id="note-header">
-                <button class="btn">
+            <div id="note-header" noteId="${respData[i].id}">
+                <button func="delete" class="btn">X</button>
+                <button color="yellowgreen" class="btn">
                     <img src="./images/green.png" alt="">
                 </button>
-                <button class="btn">
+                <button color="firebrick" class="btn">
                     <img src="./images/red.png" alt="">
                 </button>
-                <button class="btn">
+                <button color="royalblue" class="btn">
                     <img src="./images/blue.png" alt="">
                 </button>
+                <button func=save class="btn">Save</button>
             </div>
             <div class="container" id="note-field">
                 <textarea>${respData[i].note}</textarea>
@@ -111,6 +139,11 @@ async function saveNewBoard(name) {
     console.log(respData);
 
     getBoards();
+}
+
+function printBoard(boardId, boardName) {
+    document.getElementById("board").innerHTML=`<button class="btn btn-primary position-absolute end-0" id="new-note-btn">New note</button>
+    <h2 id="${boardId}">${boardName}</h2>`;
 }
 
 function ws() {
@@ -167,21 +200,53 @@ document.querySelector("#boards-menu").addEventListener("click", (e) => {
     let boardName = e.target.name;
     if (e.target.id === "new-board") {
         boardName = prompt("Enter name for new board:");
+        console.log(boardName);
+        if (boardName === "" || boardName === null) {
+            return;
+        }
         saveNewBoard(boardName);
+        return;
     }
-    document.getElementById("board").innerHTML=`<button class="btn btn-primary position-absolute end-0" id="new-note-btn">New note</button>
-    <h2 id="${boardId}">${boardName}</h2>`;
+    printBoard(boardId, boardName);
     getNotes(boardId);
     localStorage.setItem("boardId", boardId);
+    localStorage.setItem("boardName", boardName);
 });
 
 
 document.addEventListener("click", (evt) => {
+    
+    if (evt.target.tagName === "IMG") {
+        if (evt.target.parentElement.parentElement.id === "note-header") {
+            if (evt.target.parentElement.hasAttribute("color")) {
+                evt.target.parentElement.parentElement.parentElement.style.backgroundColor = evt.target.parentElement.getAttribute("color");
+            }
+        }  
+    } 
+    if (evt.target.parentElement.id === "note-header") {
+        if (evt.target.hasAttribute("color")) {
+            evt.target.parentElement.parentElement.style.backgroundColor = evt.target.getAttribute("color");
+        }
+        if (evt.target.getAttribute("func") === "save") {
+            console.log("Save this note");
+            let noteId = evt.target.parentElement.getAttribute("noteid");
+            let note = evt.target.parentElement.parentElement.children[1].children[0].value;
+            let style = evt.target.parentElement.parentElement.getAttribute("style");
+            saveNote(noteId, note, style);
+        }
+        if (evt.target.getAttribute("func") === "delete") {
+            console.log("Delete this note");
+            let noteId = evt.target.parentElement.getAttribute("noteid");
+            deleteNote(noteId);
+        }
+        
+    }
     if (evt.target.id === "new-note-btn") {
         createNewNote();
         console.log("New note");
     }
-})
+});
+
 
 
 async function createNewNote() {

@@ -34,7 +34,7 @@ router.post('/', authorize, async (req, res) => {
     }
 })
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authorize, async (req, res) => {
     console.log(req.body);
 
     try {
@@ -44,6 +44,7 @@ router.patch('/:id', async (req, res) => {
             },
             data: {
               note: req.body.note,
+              style: req.body.style
             }
           });
     

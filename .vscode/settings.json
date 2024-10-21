@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/aad5d537-0662-4b3d-91e0-4a61e3c4c2ff/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/virtual-board-v1-dennis",
+    "appService.deploySubpath": "."
+}
